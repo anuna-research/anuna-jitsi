@@ -1,0 +1,4 @@
+# Generated machine config carries component passwords inline — never commit.
+machine.json
+# Source-of-truth component passwords.
+.secrets.env

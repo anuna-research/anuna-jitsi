@@ -1,0 +1,122 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Anuna brand overlay for Jitsi Meet.
+   Appended to /usr/share/jitsi-meet/css/all.css at image build time, so these
+   rules win over the bundled defaults. Palette + type mirror ../anuna-web.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --anuna-moss: #5B8C5A;
+  --anuna-moss-dark: #4A7A49;
+  --anuna-moss-light: #6FA36E;
+  --anuna-warm: #C2873E;
+  --anuna-bg-deep: #0F1114;
+  --anuna-bg-raised: #161920;
+  --anuna-bg-card: #1C2028;
+  --anuna-text: #E0DDD6;
+  --anuna-text-dim: #8B8D8A;
+}
+
+/* Brand fonts (loaded via <link> injected into index.html) */
+body,
+.welcome,
+.toolbox-content,
+#new-toolbox,
+.subject-info-container,
+.prejoin-input-area {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Display serif for headings + wordmark, matching the anuna-web hero */
+.welcome .header-text-title,
+.welcome-page-settings h2,
+.prejoin-title,
+#new-toolbox .subject-text,
+h1, h2 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  letter-spacing: -0.01em;
+}
+
+/* Deep, near-black backgrounds (dark theme is the anuna-web default) */
+body.welcome-page,
+.welcome,
+.welcome .welcome-watermark + *,
+.premeeting-screen,
+.prejoin-page {
+  background-color: var(--anuna-bg-deep) !important;
+  background-image:
+    radial-gradient(1200px 600px at 70% -10%, rgba(91, 140, 90, 0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(194, 135, 62, 0.07), transparent 60%) !important;
+  color: var(--anuna-text);
+}
+
+.welcome .header {
+  background: transparent !important;
+}
+
+/* Hero title + tagline tones */
+.welcome .header-text-title { color: var(--anuna-text) !important; }
+.welcome .header-text-description,
+.welcome .header-text-subtitle { color: var(--anuna-text-dim) !important; }
+
+/* Moss-green primary actions: "start meeting", join, prejoin CTA */
+#enter_room_button,
+.welcome-page-button,
+.welcome .button-primary,
+.prejoin-page .action-btn.primary,
+.premeeting-screen .action-btn.primary,
+.btn-primary {
+  background-color: var(--anuna-moss) !important;
+  border-color: var(--anuna-moss) !important;
+  color: #0F1114 !important;
+  border-radius: 4px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+}
+#enter_room_button:hover,
+.welcome-page-button:hover,
+.prejoin-page .action-btn.primary:hover,
+.btn-primary:hover {
+  background-color: var(--anuna-moss-dark) !important;
+  border-color: var(--anuna-moss-dark) !important;
+}
+
+/* The room-name input on the welcome page */
+#enter_room_field,
+.enter-room input {
+  font-family: 'DM Mono', monospace !important;
+}
+#enter_room {
+  border-radius: 6px !important;
+  border: 1px solid rgba(91, 140, 90, 0.25) !important;
+  background: var(--anuna-bg-card) !important;
+}
+
+/* Warm-gold accents on links / secondary highlights */
+.welcome a,
+.welcome-page a { color: var(--anuna-warm) !important; }
+
+/* Text selection matches anuna-web (moss @ 30%) */
+::selection { background: rgba(91, 140, 90, 0.30); }
+
+/* Brand logo (watermark) sizing tweak so the square Anuna mark sits well */
+.welcome-page-logo,
+.leftwatermark {
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Recent-meetings card: match the dark theme instead of the default blue */
+.welcome-card--blue {
+  background: var(--anuna-bg-card) !important;
+  color: var(--anuna-text) !important;
+  border: 1px solid rgba(91, 140, 90, 0.15) !important;
+}
+.welcome-card--blue .meetings-list-empty,
+.welcome-card--blue .tab-content,
+.welcome-card--blue .meetings-list {
+  color: var(--anuna-text-dim) !important;
+}
+
+/* Hide the Jitsi mobile-app promo footer (not part of Anuna branding) */
+.welcome-footer {
+  display: none !important;
+}

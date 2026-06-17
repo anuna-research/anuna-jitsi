@@ -1,0 +1,6 @@
+# Keep secrets and unrelated files out of the build context.
+.secrets.env
+machine.json
+.git
+docker-compose.yml
+*.md

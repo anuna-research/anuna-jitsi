@@ -1,0 +1,81 @@
+# Jitsi Meet on Fly.io (multi-container Machine) -> https://meet.anuna.io
+# Org: anuna-research
+#
+# Architecture notes:
+#  - The official docker-jitsi-meet 4-container stack (web/prosody/jicofo/jvb)
+#    runs as containers in ONE Fly Machine. They share a network namespace, so
+#    every component talks to prosody over 127.0.0.1 (XMPP_SERVER below).
+#  - TLS is terminated at Fly's edge (auto-cert for meet.anuna.io); the web
+#    container serves plain HTTP on :80 (DISABLE_HTTPS=1).
+#  - JVB media uses UDP/10000, exposed via the dedicated [[services]] block and
+#    advertised to clients as the app's dedicated IPv4 (JVB_ADVERTISE_IPS).
+
+app = "anuna-meet"
+primary_region = "syd"
+
+# The 4 Jitsi containers (web/prosody/jicofo/jvb) are defined in machine.json.
+# Fly stable CLI doesn't deploy compose files, so we use the native multi-container
+# machine_config. `container = "web"` tells `fly deploy` to place the built/pinned
+# app image into the web container; the other three pull their public images.
+[build]
+  dockerfile = "web/Dockerfile"
+
+[experimental]
+  machine_config = "machine.json"
+  container = "web"
+
+[env]
+  TZ = "UTC"
+  PUBLIC_URL = "https://meet.anuna.io"
+
+  # All components reach prosody on localhost (shared netns in the Machine).
+  XMPP_SERVER = "127.0.0.1"
+  XMPP_BOSH_URL_BASE = "http://127.0.0.1:5280"
+  XMPP_DOMAIN = "meet.jitsi"
+  XMPP_AUTH_DOMAIN = "auth.meet.jitsi"
+  XMPP_MUC_DOMAIN = "muc.meet.jitsi"
+  XMPP_INTERNAL_MUC_DOMAIN = "internal-muc.meet.jitsi"
+  XMPP_GUEST_DOMAIN = "guest.meet.jitsi"
+  XMPP_RECORDER_DOMAIN = "recorder.meet.jitsi"
+  XMPP_HIDDEN_DOMAIN = "hidden.meet.jitsi"
+  JVB_BREWERY_MUC = "jvbbrewery"
+  JVB_AUTH_USER = "jvb"
+
+  # TLS at the Fly edge, not in-container.
+  DISABLE_HTTPS = "1"
+  ENABLE_HTTP_REDIRECT = "0"
+  ENABLE_LETSENCRYPT = "0"
+  ENABLE_HSTS = "0"
+
+  # Open meeting (no login) for the first working deploy; can layer auth later.
+  ENABLE_AUTH = "0"
+  ENABLE_GUESTS = "1"
+
+  ENABLE_XMPP_WEBSOCKET = "1"
+  ENABLE_COLIBRI_WEBSOCKET = "1"
+
+  # Media: advertise the app's dedicated IPv4 so clients send RTP to Fly's edge.
+  JVB_PORT = "10000"
+  JVB_ADVERTISE_IPS = "213.188.199.193"
+  DOCKER_HOST_ADDRESS = "213.188.199.193"
+
+# Web UI: Fly edge TLS (443) -> web container :80
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+
+# JVB media: UDP/10000 -> jvb container :10000 (shared netns)
+[[services]]
+  protocol = "udp"
+  internal_port = 10000
+
+  [[services.ports]]
+    port = 10000
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 4
+  memory_mb = 4096
